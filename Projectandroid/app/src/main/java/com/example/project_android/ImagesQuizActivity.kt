@@ -21,30 +21,31 @@ class ImagesQuizActivity : AppCompatActivity() {
     private var incorrectAnswers = 0 // Count incorrect answers
 
     private val images = listOf(
-        ImageItem(listOf("L", "light","kenny"), R.drawable.l_death_note),
-        ImageItem(listOf("Image 2", "Option 2"), R.drawable.livail), // attaque des titans livail
-        ImageItem(listOf("Image 3", "Option 3"), R.drawable.ciel_phantomhive_kuroshitsuji),
-        ImageItem(listOf("Image 4", "Option 4"), R.drawable.rem_rezero),
-        ImageItem(listOf("Image 5", "Option 5"), R.drawable.asuna_sword_art_online),
-        ImageItem(listOf("Image 6", "Option 6"), R.drawable.eikichi_onizuka_oreat_teacher_onizuka),
-        ImageItem(listOf("Image 7", "Option 7"), R.drawable.erza_scarlett_fairy_tail),
-        ImageItem(listOf("Image 8", "Option 8"), R.drawable.uzumaki_naruto_naruto),
-        ImageItem(listOf("Image 9", "Option 9"), R.drawable.grey_fullbuster_fairy_tail),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.haruno_sakura_naruto),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.hinata_hyuuga_naruto),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.hitsugaya_t_333_shir_bleach),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.yato_noragami),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.itachi_uchiwa_naruto),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.kakashi_hatake_naruto),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.ulquiorra_schiffer_bleach),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.sabaku_no_gaara_naruto),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.kurosaki_ichigo_bleach),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.mikasa_ackerman_snk),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.portgas_d_ace_one_piece),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.kamado_nezuko_kimetsu_no_yaiba),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.sebastian_michaelis_kuroshitsuji),
-        ImageItem(listOf("Image 10", "Option 10"), R.drawable.kirito_sword_art_online)
+        ImageItem(listOf("l", "light", "kenny", "ryuk"), R.drawable.l_death_note),
+        ImageItem(listOf("livail", "eren", "mikasa", "reiner"), R.drawable.livail), // attaque des titans: livail
+        ImageItem(listOf("ciel", "sebastian", "grell", "undertaker"), R.drawable.ciel_phantomhive_kuroshitsuji),
+        ImageItem(listOf("rem", "emilia", "crusch", "reid"), R.drawable.rem_rezero),
+        ImageItem(listOf("asuna", "kirito", "leafa", "suguha"), R.drawable.asuna_sword_art_online),
+        ImageItem(listOf("eikichi", "onizuka", "fujimoto", "takahashi"), R.drawable.eikichi_onizuka_oreat_teacher_onizuka),
+        ImageItem(listOf("erza", "natsu", "lucy", "gray"), R.drawable.erza_scarlett_fairy_tail),
+        ImageItem(listOf("naruto", "sasuke", "kakashi", "sakura"), R.drawable.uzumaki_naruto_naruto),
+        ImageItem(listOf("grey", "natsu", "lucy", "wendy"), R.drawable.grey_fullbuster_fairy_tail),
+        ImageItem(listOf("sakura", "hinata", "ino", "temari"), R.drawable.haruno_sakura_naruto),
+        ImageItem(listOf("hinita", "sakura", "ino", "tsunade"), R.drawable.hinata_hyuuga_naruto),
+        ImageItem(listOf("hitsuyaga", "ichigo", "renji", "yoruichi"), R.drawable.hitsugaya_t_333_shir_bleach),
+        ImageItem(listOf("yato", "hiyori", "bishi", "aki"), R.drawable.yato_noragami),
+        ImageItem(listOf("itachi", "sasuke", "madara", "kage"), R.drawable.itachi_uchiwa_naruto),
+        ImageItem(listOf("kakashi", "naruto", "sasuke", "iruka"), R.drawable.kakashi_hatake_naruto),
+        ImageItem(listOf("ulquiorra", "grimmjow", "ichigo", "neon"), R.drawable.ulquiorra_schiffer_bleach),
+        ImageItem(listOf("gaara", "kankuro", "temari", "sasori"), R.drawable.sabaku_no_gaara_naruto),
+        ImageItem(listOf("ichigo", "rukia", "orihime", "uryu"), R.drawable.kurosaki_ichigo_bleach),
+        ImageItem(listOf("mikasa", "armin", "jean", "levi"), R.drawable.mikasa_ackerman_snk),
+        ImageItem(listOf("ace", "luffy", "sabo", "garp"), R.drawable.portgas_d_ace_one_piece),
+        ImageItem(listOf("nezuko", "tanjiro", "zenitsu", "inosuke"), R.drawable.kamado_nezuko_kimetsu_no_yaiba),
+        ImageItem(listOf("sebastien", "ciel", "grell", "william"), R.drawable.sebastian_michaelis_kuroshitsuji),
+        ImageItem(listOf("kirito", "asuna", "leafa", "yui"), R.drawable.kirito_sword_art_online)
     )
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
