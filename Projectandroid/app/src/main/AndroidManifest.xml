@@ -43,6 +43,15 @@
         <activity android:name=".FilmActivity" />
         <activity android:name=".SeriesActivity" />
         <activity android:name=".SportsActivity" />
+        <activity
+            android:name=".MusicQuizActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
 
 

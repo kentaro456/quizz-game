@@ -22,6 +22,8 @@ class HomeActivity : AppCompatActivity() {
         val seriesButton: Button = findViewById(R.id.seriesButton)
         val animesButton: Button = findViewById(R.id.animesButton)
         val sportsButton: Button = findViewById(R.id.sportsButton)
+        val MusicButton: Button = findViewById(R.id.MusicButton)
+
         val quizButton: Button = findViewById(R.id.quizButton)
 
         filmsButton.setOnClickListener {
@@ -43,6 +45,10 @@ class HomeActivity : AppCompatActivity() {
             selectedCategory = "Sports"
             Toast.makeText(this, "Catégorie Sports sélectionnée", Toast.LENGTH_SHORT).show()
         }
+        MusicButton.setOnClickListener {
+            selectedCategory = "Music"
+            Toast.makeText(this, "Catégorie Music sélectionnée", Toast.LENGTH_SHORT).show()
+        }
 
         quizButton.setOnClickListener {
             if (selectedCategory != null) {
@@ -51,6 +57,7 @@ class HomeActivity : AppCompatActivity() {
                    "Séries" -> startActivity(Intent(this, SeriesActivity::class.java))
                     "Animés" -> startActivity(Intent(this, QuizActivity::class.java))
                      "Sports" -> startActivity(Intent(this, SportsActivity::class.java))
+                    "Music" -> startActivity(Intent(this, MusicQuizActivity::class.java))
                 }
             } else {
                 Toast.makeText(this, "Veuillez sélectionner une catégorie", Toast.LENGTH_SHORT).show()
