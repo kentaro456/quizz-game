@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Projectandroid"
+        tools:targetApi="31">
+
+        <!-- Déclaration de LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Projectandroid">
+            <intent-filter>
+                <!-- Définir LoginActivity comme activité principale -->
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Déclaration de HomeActivity -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Projectandroid" />
+
+        <!-- Déclaration de MainActivity si nécessaire (cette activité ne sera pas lancée au démarrage) -->
+
+        <!-- Déclaration de QuizActivity -->
+        <activity
+            android:name=".QuizActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Projectandroid" />
+
+        <activity android:name=".FilmActivity" />
+        <activity android:name=".SeriesActivity" />
+        <activity android:name=".SportsActivity" />
+
+
+
+    </application>
+
+</manifest>
