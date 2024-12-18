@@ -127,6 +127,24 @@
             android:elevation="4dp"
             android:stateListAnimator="@null"
             app:rippleColor="#F1C40F" />
+        <!-- Catégorie Images -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ImagesButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:text=" b@string/Images"
+            android:textColor="@android:color/white"
+            app:cornerRadius="16dp"
+            android:layout_marginBottom="16dp"
+            android:padding="16dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="#F39C12"
+            app:strokeWidth="2dp"
+            app:backgroundTint="#34495E"
+            android:elevation="4dp"
+            android:stateListAnimator="@null"
+            app:rippleColor="#F1C40F" />
     </GridLayout>
 
     <com.google.android.material.button.MaterialButton

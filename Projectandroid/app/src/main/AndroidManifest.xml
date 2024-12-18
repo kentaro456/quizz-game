@@ -52,6 +52,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Déclaration de ImagesQuizActivity -->
+        <activity
+            android:name=".ImagesQuizActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Projectandroid">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
 
 

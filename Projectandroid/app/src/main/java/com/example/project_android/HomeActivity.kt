@@ -1,5 +1,6 @@
 package com.example.project_android
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -14,6 +15,7 @@ class HomeActivity : AppCompatActivity() {
 
     private var selectedCategory: String? = null
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -23,6 +25,7 @@ class HomeActivity : AppCompatActivity() {
         val animesButton: Button = findViewById(R.id.animesButton)
         val sportsButton: Button = findViewById(R.id.sportsButton)
         val MusicButton: Button = findViewById(R.id.MusicButton)
+        val ImagesButton: Button = findViewById(R.id.ImagesButton)
 
         val quizButton: Button = findViewById(R.id.quizButton)
 
@@ -49,6 +52,10 @@ class HomeActivity : AppCompatActivity() {
             selectedCategory = "Music"
             Toast.makeText(this, "Catégorie Music sélectionnée", Toast.LENGTH_SHORT).show()
         }
+        ImagesButton.setOnClickListener {
+            selectedCategory = "Images"
+            Toast.makeText(this, "Catégorie Images sélectionnée", Toast.LENGTH_SHORT).show()
+        }
 
         quizButton.setOnClickListener {
             if (selectedCategory != null) {
@@ -58,6 +65,7 @@ class HomeActivity : AppCompatActivity() {
                     "Animés" -> startActivity(Intent(this, QuizActivity::class.java))
                      "Sports" -> startActivity(Intent(this, SportsActivity::class.java))
                     "Music" -> startActivity(Intent(this, MusicQuizActivity::class.java))
+                    "Images" -> startActivity(Intent(this, ImagesQuizActivity::class.java))
                 }
             } else {
                 Toast.makeText(this, "Veuillez sélectionner une catégorie", Toast.LENGTH_SHORT).show()
