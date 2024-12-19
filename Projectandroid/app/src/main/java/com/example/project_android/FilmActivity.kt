@@ -1,21 +1,36 @@
 package com.example.project_android
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.os.Handler
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.project_android.R.id.buttonReturn
+import androidx.lifecycle.MutableLiveData
 import kotlin.random.Random
 
-// Classe principale pour l'activité Quiz sur les films
 class FilmActivity : AppCompatActivity() {
+    private lateinit var questionTextView: TextView
+    private lateinit var answerButton1: Button
+    private lateinit var answerButton2: Button
+    private lateinit var answerButton3: Button
+    private lateinit var answerButton4: Button
+    private lateinit var scoreTextView: TextView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var buttonReturn: Button
 
-    private lateinit var quizGame: QuizGame
+    private val gameState = MutableLiveData<GameState>()
+    private var usedQuestions = mutableSetOf<Int>()
 
-    // Liste des questions spécifiques aux films
-    private val filmQuestions = listOf(
+    private data class GameState(
+        var score: Int = 0,
+        var incorrectAnswers: Int = 0,
+        var currentQuestionIndex: Int = -1
+    )
+
+    private val questions = listOf(
         // Films d'action
         Question("Quel est le nom du héros principal dans la série de films 'Die Hard' ?", listOf("John McClane", "Bruce Willis", "Hans Gruber", "Al Powell"), "John McClane"),
         Question("Qui joue le rôle de James Bond dans 'Casino Royale' ?", listOf("Daniel Craig", "Pierce Brosnan", "Sean Connery", "Roger Moore"), "Daniel Craig"),
@@ -73,79 +88,52 @@ class FilmActivity : AppCompatActivity() {
         Question("Quel est le nom du réalisateur de 'Get Out' ?", listOf("Jordan Peele", "Daniel Kaluuya", "Allison Williams", "Bradley Whitford"), "Jordan Peele")
     )
 
+    companion object {
+        const val MAX_SCORE = 10
+        const val MAX_INCORRECT = 3
+        const val POINTS_PER_CORRECT = 1
+    }
+
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_film)
 
-        // Mélanger les questions
-        val shuffledQuestions = filmQuestions.shuffled()
+        initializeViews()
+        setupGameStateObserver()
+        setupClickListeners()
 
-        // Initialiser le jeu avec les questions mélangées
-        quizGame = QuizGame(shuffledQuestions)
+        gameState.value = GameState()
+        loadQuestionAndOptions()
+    }
 
-        // Initialisation des vues
-        val questionTextView: TextView = findViewById(R.id.questionTextView)
-        val answerButton1: Button = findViewById(R.id.answerButton1)
-        val answerButton2: Button = findViewById(R.id.answerButton2)
-        val answerButton3: Button = findViewById(R.id.answerButton3)
-        val answerButton4: Button = findViewById(R.id.answerButton4)
-        val scoreTextView: TextView = findViewById(R.id.scoreTextView)
-        val buttonReturn : Button = findViewById(buttonReturn)
+    private fun initializeViews() {
+        questionTextView = findViewById(R.id.questionTextView)
+        answerButton1 = findViewById(R.id.answerButton1)
+        answerButton2 = findViewById(R.id.answerButton2)
+        answerButton3 = findViewById(R.id.answerButton3)
+        answerButton4 = findViewById(R.id.answerButton4)
+        scoreTextView = findViewById(R.id.scoreTextView)
+        progressBar = findViewById(R.id.progressBar)
+        buttonReturn = findViewById(R.id.buttonReturn)
 
-        // Fonction pour charger la question actuelle et les réponses
-        fun loadQuestion() {
-            val currentQuestion = quizGame.getCurrentQuestion()
-            questionTextView.text = currentQuestion.text
+        // Initialize progress bar
+        progressBar.max = MAX_SCORE
+        progressBar.progress = 0
+    }
 
-            // Mélanger les réponses
-            val shuffledAnswers = currentQuestion.answers.shuffled()
-            answerButton1.text = shuffledAnswers[0]
-            answerButton2.text = shuffledAnswers[1]
-            answerButton3.text = shuffledAnswers[2]
-            answerButton4.text = shuffledAnswers[3]
+    private fun setupGameStateObserver() {
+        gameState.observe(this) { state ->
+            scoreTextView.text = getString(R.string.score_format, state.score)
+            progressBar.progress = state.score
         }
+    }
 
-        // Fonction pour mettre à jour le score affiché
-        fun updateScore() {
-            scoreTextView.text = "Score: ${quizGame.score}"
-        }
-
-        // Fonction pour gérer la fin du jeu
-        fun checkGameStatus() {
-            if (quizGame.isGameOver()) {
-                Toast.makeText(this, quizGame.getGameStatus(), Toast.LENGTH_LONG).show()
-                val intent = Intent(this, HomeActivity::class.java) // Redirection vers une autre activité
-                startActivity(intent)
-                finish()
-            }
-        }
-
-        // Initialisation de la première question et du score
-        loadQuestion()
-        updateScore()
-
-        // Fonction générique pour gérer les réponses
-        fun onAnswerSelected(answer: String) {
-            if (quizGame.checkAnswer(answer)) {
-                quizGame.score++
-            } else {
-                quizGame.wrongAnswers++
-                Toast.makeText(this, "Mauvaise réponse ! Erreurs: ${quizGame.wrongAnswers}", Toast.LENGTH_SHORT).show()
-            }
-
-            updateScore()
-
-            // Passer à la question suivante
-            quizGame.nextQuestion()
-            checkGameStatus()
-            loadQuestion()
-        }
-
-        // Gestion de l'événement au clic sur chaque bouton de réponse
-        answerButton1.setOnClickListener { onAnswerSelected(answerButton1.text.toString()) }
-        answerButton2.setOnClickListener { onAnswerSelected(answerButton2.text.toString()) }
-        answerButton3.setOnClickListener { onAnswerSelected(answerButton3.text.toString()) }
-        answerButton4.setOnClickListener { onAnswerSelected(answerButton4.text.toString()) }
+    private fun setupClickListeners() {
+        answerButton1.setOnClickListener { checkAnswer(answerButton1.text.toString()) }
+        answerButton2.setOnClickListener { checkAnswer(answerButton2.text.toString()) }
+        answerButton3.setOnClickListener { checkAnswer(answerButton3.text.toString()) }
+        answerButton4.setOnClickListener { checkAnswer(answerButton4.text.toString()) }
 
         buttonReturn.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
@@ -154,36 +142,94 @@ class FilmActivity : AppCompatActivity() {
         }
     }
 
-}
+    private fun loadQuestionAndOptions() {
+        gameState.value?.let { state ->
+            // Select a random unused question
+            val availableIndices = questions.indices.toSet() - usedQuestions
+            if (availableIndices.isEmpty()) {
+                usedQuestions.clear() // Reset if all questions have been used
+            }
 
-// Classe pour représenter une question
-data class Questione(val text: String, val answers: List<String>, val correctAnswer: String)
+            state.currentQuestionIndex = availableIndices.random()
+            usedQuestions.add(state.currentQuestionIndex)
 
-// Classe pour gérer la logique du quiz
-class QuizGamee(private val questions: List<Question>) {
-    private var currentQuestionIndex = 0
-    var score = 0
-    var wrongAnswers = 0
+            val currentQuestion = questions[state.currentQuestionIndex]
 
-    fun getCurrentQuestion(): Question {
-        return questions[currentQuestionIndex]
-    }
-
-    fun checkAnswer(answer: String): Boolean {
-        return getCurrentQuestion().correctAnswer == answer
-    }
-
-    fun nextQuestion() {
-        if (currentQuestionIndex < questions.size - 1) {
-            currentQuestionIndex++
+            // Update UI
+            questionTextView.text = currentQuestion.text
+            setupOptions(currentQuestion)
         }
     }
 
-    fun isGameOver(): Boolean {
-        return currentQuestionIndex >= questions.size - 1
+    private fun setupOptions(currentQuestion: Question) {
+        val shuffledAnswers = currentQuestion.answers.shuffled()
+        answerButton1.text = shuffledAnswers[0]
+        answerButton2.text = shuffledAnswers[1]
+        answerButton3.text = shuffledAnswers[2]
+        answerButton4.text = shuffledAnswers[3]
     }
 
-    fun getGameStatus(): String {
-        return "Quiz terminé ! Votre score est de $score sur ${questions.size}"
+    private fun checkAnswer(selectedAnswer: String) {
+        gameState.value?.let { state ->
+            val currentQuestion = questions[state.currentQuestionIndex]
+
+            if (selectedAnswer == currentQuestion.correctAnswer) {
+                handleCorrectAnswer(state)
+            } else {
+                handleIncorrectAnswer(state, currentQuestion.correctAnswer)
+            }
+        }
+    }
+
+    private fun handleCorrectAnswer(state: GameState) {
+        state.score += POINTS_PER_CORRECT
+        showAnswerDialog(true)
+
+        if (state.score >= MAX_SCORE) {
+            endGame(getString(R.string.win_message))
+        } else {
+            gameState.value = state
+            loadQuestionAndOptions()
+        }
+    }
+
+    private fun handleIncorrectAnswer(state: GameState, correctAnswer: String) {
+        state.incorrectAnswers++
+        showAnswerDialog(false, correctAnswer)
+
+        if (state.incorrectAnswers >= MAX_INCORRECT) {
+            endGame(getString(R.string.game_over_message))
+        } else {
+            gameState.value = state
+            loadQuestionAndOptions()
+        }
+    }
+
+    private fun showAnswerDialog(isCorrect: Boolean, correctAnswer: String = "") {
+        AlertDialog.Builder(this)
+            .setTitle(if (isCorrect) getString(R.string.correct) else getString(R.string.incorrect))
+            .setMessage(if (isCorrect)
+                getString(R.string.correct_message)
+            else getString(R.string.incorrect_message, correctAnswer))
+            .setPositiveButton(getString(R.string.continue_button)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun endGame(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.game_ended))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.return_home)) { _, _ ->
+                goToHome()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun goToHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 }

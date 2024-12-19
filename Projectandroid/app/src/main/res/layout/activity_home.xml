@@ -133,7 +133,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
-            android:text=" b@string/Images"
+            android:text=" @string/Images"
             android:textColor="@android:color/white"
             app:cornerRadius="16dp"
             android:layout_marginBottom="16dp"

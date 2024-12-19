@@ -21,4 +21,13 @@
 
     <!-- Couleur accentuée -->
     <color name="holo_blue_dark">#00579C</color>
+    <color name="background_color">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="question_text_color">#212121</color>
+    <color name="score_color">#2196F3</color>
+    <color name="progress_color">#757575</color>
+    <color name="difficulty_color">#FF9800</color>
+    <color name="option_text_color">#424242</color>
+    <color name="option_selected_color">#E3F2FD</color>
+
 </resources>

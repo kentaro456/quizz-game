@@ -1,53 +1,48 @@
 package com.example.project_android
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.project_android.R.id.buttonReturn
+import androidx.lifecycle.MutableLiveData
 import kotlin.random.Random
 
-// Classe représentant une question et ses réponses possibles
 data class Question(val text: String, val answers: List<String>, val correctAnswer: String)
 
-// Classe représentant la logique du jeu
 class QuizGame(private val questions: List<Question>) {
     private var currentQuestionIndex = 0
     var score = 0
     var wrongAnswers = 0
 
-    // Fonction pour obtenir la question actuelle
     fun getCurrentQuestion(): Question {
         return questions[currentQuestionIndex]
     }
 
-    // Fonction pour vérifier si la réponse est correcte
     fun checkAnswer(userAnswer: String): Boolean {
         val currentQuestion = getCurrentQuestion()
         return userAnswer.trim().equals(currentQuestion.correctAnswer, ignoreCase = true)
     }
 
-    // Fonction pour passer à la question suivante
     fun nextQuestion() {
         currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
     }
 
-    // Fonction pour réinitialiser le jeu
     fun restartGame() {
         score = 0
         wrongAnswers = 0
         currentQuestionIndex = 0
     }
 
-    // Fonction pour vérifier si le jeu est terminé (victoire ou défaite)
     fun isGameOver(): Boolean {
         return score >= 10 || wrongAnswers >= 3
     }
 
-    // Fonction pour obtenir l'état du jeu (victoire ou défaite)
     fun getGameStatus(): String {
         return when {
             score >= 10 -> "Félicitations, vous avez gagné !"
@@ -57,12 +52,24 @@ class QuizGame(private val questions: List<Question>) {
     }
 }
 
-// Classe principale de l'activité qui gère l'interface utilisateur
 class QuizActivity : AppCompatActivity() {
-    private lateinit var quizGame: QuizGame
+    private lateinit var questionTextView: TextView
+    private lateinit var answerButton1: Button
+    private lateinit var answerButton2: Button
+    private lateinit var answerButton3: Button
+    private lateinit var answerButton4: Button
+    private lateinit var scoreTextView: TextView
+    private lateinit var buttonReturn: Button
 
-    // Liste des questions avec leurs réponses possibles
-    // Liste des questions avec leurs réponses possibles
+    private val gameState = MutableLiveData<GameState>()
+    private var usedQuestions = mutableSetOf<Int>()
+
+    private data class GameState(
+        var score: Int = 0,
+        var incorrectAnswers: Int = 0,
+        var currentQuestionIndex: Int = -1
+    )
+
     private val questions = listOf(
         // Naruto
         Question("Qui est le personnage principal de Naruto ?", listOf("Naruto Uzumaki", "Sasuke Uchiha", "Kakashi Hatake", "Jiraiya"), "Naruto Uzumaki"),
@@ -119,119 +126,50 @@ class QuizActivity : AppCompatActivity() {
         Question("Quel est le nom du personnage principal de One Punch Man ?", listOf("Saitama", "Genos", "Mumen Rider", "Speed-o'-Sound Sonic"), "Saitama"),
         Question("Quel est le nom du personnage principal de Black Clover ?", listOf("Asta", "Yuno", "Noelle Silva", "Gauche Adlai"), "Asta"),
         Question("Quel est le nom du personnage principal de JoJo's Bizarre Adventure ?", listOf("Jonathan Joestar", "Joseph Joestar", "Jotaro Kujo", "Josuke Higashikata"), "Jonathan Joestar"),
-        Question("Quel est le nom du personnage principal de Re:Zero ?", listOf("Subaru Natsuki", "Emilia", "Rem", "Ram"), "Subaru Natsuki"),
-        Question("Quel est le nom du personnage principal de Bleach ?", listOf("Ichigo Kurosaki", "Rukia Kuchiki", "Orihime Inoue", "Uryu Ishida"), "Ichigo Kurosaki"),
-        Question("Quel est le nom du personnage principal de Fullmetal Alchemist ?", listOf("Edward Elric", "Alphonse Elric", "Winry Rockbell", "Roy Mustang"), "Edward Elric"),
-        Question("Quel est le nom du personnage principal de Death Note ?", listOf("Light Yagami", "L", "Misa Amane", "Near"), "Light Yagami"),
-        Question("Quel est le nom du personnage principal de Fairy Tail ?", listOf("Natsu Dragneel", "Lucy Heartfilia", "Erza Scarlet", "Gray Fullbuster"), "Natsu Dragneel"),
-        Question("Quel est le nom du personnage principal de Sword Art Online ?", listOf("Kirito", "Asuna", "Leafa", "Klein"), "Kirito"),
-        Question("Quel est le nom du personnage principal de Attack on Titan ?", listOf("Eren Yeager", "Mikasa Ackerman", "Armin Arlert", "Levi Ackerman"), "Eren Yeager"),
-        Question("Quel est le nom du personnage principal de My Hero Academia ?", listOf("Izuku Midoriya", "Katsuki Bakugo", "Shoto Todoroki", "All Might"), "Izuku Midoriya"),
-        Question("Quel est le nom du personnage principal de Demon Slayer ?", listOf("Tanjiro Kamado", "Nezuko Kamado", "Zenitsu Agatsuma", "Inosuke Hashibira"), "Tanjiro Kamado"),
-        Question("Quel est le nom du personnage principal de Hunter x Hunter ?", listOf("Gon Freecss", "Killua Zoldyck", "Kurapika", "Leorio Paradinight"), "Gon Freecss"),
-        Question("Quel est le nom du personnage principal de Naruto Shippuden ?", listOf("Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno", "Kakashi Hatake"), "Naruto Uzumaki"),
-        Question("Quel est le nom du personnage principal de One Punch Man ?", listOf("Saitama", "Genos", "Mumen Rider", "Speed-o'-Sound Sonic"), "Saitama"),
-        Question("Quel est le nom du personnage principal de Black Clover ?", listOf("Asta", "Yuno", "Noelle Silva", "Gauche Adlai"), "Asta"),
-        Question("Quel est le nom du personnage principal de JoJo's Bizarre Adventure ?", listOf("Jonathan Joestar", "Joseph Joestar", "Jotaro Kujo", "Josuke Higashikata"), "Jonathan Joestar"),
-        Question("Quel est le nom du personnage principal de Re:Zero ?", listOf("Subaru Natsuki", "Emilia", "Rem", "Ram"), "Subaru Natsuki"),
-        Question("Quel est le nom du personnage principal de Bleach ?", listOf("Ichigo Kurosaki", "Rukia Kuchiki", "Orihime Inoue", "Uryu Ishida"), "Ichigo Kurosaki"),
-        Question("Quel est le nom du personnage principal de Fullmetal Alchemist ?", listOf("Edward Elric", "Alphonse Elric", "Winry Rockbell", "Roy Mustang"), "Edward Elric"),
-        Question("Quel est le nom du personnage principal de Death Note ?", listOf("Light Yagami", "L", "Misa Amane", "Near"), "Light Yagami"),
-        Question("Quel est le nom du personnage principal de Fairy Tail ?", listOf("Natsu Dragneel", "Lucy Heartfilia", "Erza Scarlet", "Gray Fullbuster"), "Natsu Dragneel"),
-        Question("Quel est le nom du personnage principal de Sword Art Online ?", listOf("Kirito", "Asuna", "Leafa", "Klein"), "Kirito"),
-        Question("Quel est le nom du personnage principal de Attack on Titan ?", listOf("Eren Yeager", "Mikasa Ackerman", "Armin Arlert", "Levi Ackerman"), "Eren Yeager"),
-        Question("Quel est le nom du personnage principal de My Hero Academia ?", listOf("Izuku Midoriya", "Katsuki Bakugo", "Shoto Todoroki", "All Might"), "Izuku Midoriya"),
-        Question("Quel est le nom du personnage principal de Demon Slayer ?", listOf("Tanjiro Kamado", "Nezuko Kamado", "Zenitsu Agatsuma", "Inosuke Hashibira"), "Tanjiro Kamado"),
-        Question("Quel est le nom du personnage principal de Hunter x Hunter ?", listOf("Gon Freecss", "Killua Zoldyck", "Kurapika", "Leorio Paradinight"), "Gon Freecss"),
-        Question("Quel est le nom du personnage principal de Naruto Shippuden ?", listOf("Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno", "Kakashi Hatake"), "Naruto Uzumaki"),
-        Question("Quel est le nom du personnage principal de One Punch Man ?", listOf("Saitama", "Genos", "Mumen Rider", "Speed-o'-Sound Sonic"), "Saitama"),
-        Question("Quel est le nom du personnage principal de Black Clover ?", listOf("Asta", "Yuno", "Noelle Silva", "Gauche Adlai"), "Asta"),
-        Question("Quel est le nom du personnage principal de JoJo's Bizarre Adventure ?", listOf("Jonathan Joestar", "Joseph Joestar", "Jotaro Kujo", "Josuke Higashikata"), "Jonathan Joestar"),
         Question("Quel est le nom du personnage principal de Re:Zero ?", listOf("Subaru Natsuki", "Emilia", "Rem", "Ram"), "Subaru Natsuki")
     )
+
+    companion object {
+        const val MAX_SCORE = 10
+        const val MAX_INCORRECT = 3
+        const val POINTS_PER_CORRECT = 1
+    }
+
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        // Mélanger les questions
-        val shuffledQuestions = questions.shuffled()
+        initializeViews()
+        setupGameStateObserver()
+        setupClickListeners()
 
-        // Initialiser le jeu avec les questions mélangées
-        quizGame = QuizGame(shuffledQuestions)
+        gameState.value = GameState()
+        loadQuestionAndOptions()
+    }
 
-        // Initialisation des vues
-        val questionTextView: TextView = findViewById(R.id.questionTextView)
-        val answerButton1: Button = findViewById(R.id.answerButton1)
-        val answerButton2: Button = findViewById(R.id.answerButton2)
-        val answerButton3: Button = findViewById(R.id.answerButton3)
-        val answerButton4: Button = findViewById(R.id.answerButton4)
-        val scoreTextView: TextView = findViewById(R.id.scoreTextView)
-        val buttonReturn : Button = findViewById(buttonReturn)
+    private fun initializeViews() {
+        questionTextView = findViewById(R.id.questionTextView)
+        answerButton1 = findViewById(R.id.answerButton1)
+        answerButton2 = findViewById(R.id.answerButton2)
+        answerButton3 = findViewById(R.id.answerButton3)
+        answerButton4 = findViewById(R.id.answerButton4)
+        scoreTextView = findViewById(R.id.scoreTextView)
+        buttonReturn = findViewById(R.id.buttonReturn)
+    }
 
-        // Fonction pour charger la question actuelle et les réponses
-        fun loadQuestion() {
-            val currentQuestion = quizGame.getCurrentQuestion()
-            questionTextView.text = currentQuestion.text
-
-            // Mélanger les réponses
-            val shuffledAnswers = currentQuestion.answers.shuffled()
-            answerButton1.text = shuffledAnswers[0]
-            answerButton2.text = shuffledAnswers[1]
-            answerButton3.text = shuffledAnswers[2]
-            answerButton4.text = shuffledAnswers[3]
+    private fun setupGameStateObserver() {
+        gameState.observe(this) { state ->
+            scoreTextView.text = getString(R.string.score_format, state.score)
         }
+    }
 
-        // Fonction pour mettre à jour le score affiché
-        fun updateScore() {
-            scoreTextView.text = "Score: ${quizGame.score}"
-        }
+    private fun setupClickListeners() {
+        answerButton1.setOnClickListener { checkAnswer(answerButton1.text.toString()) }
+        answerButton2.setOnClickListener { checkAnswer(answerButton2.text.toString()) }
+        answerButton3.setOnClickListener { checkAnswer(answerButton3.text.toString()) }
+        answerButton4.setOnClickListener { checkAnswer(answerButton4.text.toString()) }
 
-        // Fonction pour gérer la fin du jeu
-        fun checkGameStatus() {
-            if (quizGame.isGameOver()) {
-                Toast.makeText(this, quizGame.getGameStatus(), Toast.LENGTH_LONG).show()
-                // Vous pouvez rediriger vers une autre activité ou terminer le quiz
-                quizGame.restartGame()
-                loadQuestion()
-                updateScore()
-                // Rediriger vers une autre activité (par exemple, le menu principal)
-                val intent = Intent(this, HomeActivity::class.java) // Remplacez HomeActivity par votre activité cible
-                startActivity(intent)
-
-                // Vous pouvez également terminer l'activité actuelle si vous ne souhaitez pas revenir à celle-ci
-                finish()
-            }
-        }
-
-        // Initialisation de la première question et du score
-        loadQuestion()
-        updateScore()
-
-        // Fonction générique pour gérer les réponses
-        fun onAnswerSelected(answer: String) {
-            if (quizGame.checkAnswer(answer)) {
-                quizGame.score++
-            } else {
-                quizGame.wrongAnswers++
-                Toast.makeText(this, "Mauvaise réponse ! Erreurs: ${quizGame.wrongAnswers}", Toast.LENGTH_SHORT).show()
-            }
-
-            updateScore()
-            checkGameStatus()
-
-            // Passer à la question suivante avec un délai pour mieux gérer les réponses rapides
-            Handler().postDelayed({
-                quizGame.nextQuestion()
-                loadQuestion()
-            }, 1000) // 1 seconde de délai
-        }
-
-        // Gestion de l'événement au clic sur chaque bouton de réponse
-        answerButton1.setOnClickListener { onAnswerSelected(answerButton1.text.toString()) }
-        answerButton2.setOnClickListener { onAnswerSelected(answerButton2.text.toString()) }
-        answerButton3.setOnClickListener { onAnswerSelected(answerButton3.text.toString()) }
-        answerButton4.setOnClickListener { onAnswerSelected(answerButton4.text.toString()) }
-        // Gestion de l'événement au clic sur le bouton "Retour"
         buttonReturn.setOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
@@ -239,5 +177,94 @@ class QuizActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadQuestionAndOptions() {
+        gameState.value?.let { state ->
+            // Select a random unused question
+            val availableIndices = questions.indices.toSet() - usedQuestions
+            if (availableIndices.isEmpty()) {
+                usedQuestions.clear() // Reset if all questions have been used
+            }
 
+            state.currentQuestionIndex = availableIndices.random()
+            usedQuestions.add(state.currentQuestionIndex)
+
+            val currentQuestion = questions[state.currentQuestionIndex]
+
+            // Update UI
+            questionTextView.text = currentQuestion.text
+            setupOptions(currentQuestion)
+        }
+    }
+
+    private fun setupOptions(currentQuestion: Question) {
+        val shuffledAnswers = currentQuestion.answers.shuffled()
+        answerButton1.text = shuffledAnswers[0]
+        answerButton2.text = shuffledAnswers[1]
+        answerButton3.text = shuffledAnswers[2]
+        answerButton4.text = shuffledAnswers[3]
+    }
+
+    private fun checkAnswer(selectedAnswer: String) {
+        gameState.value?.let { state ->
+            val currentQuestion = questions[state.currentQuestionIndex]
+
+            if (selectedAnswer == currentQuestion.correctAnswer) {
+                handleCorrectAnswer(state)
+            } else {
+                handleIncorrectAnswer(state, currentQuestion.correctAnswer)
+            }
+        }
+    }
+
+    private fun handleCorrectAnswer(state: GameState) {
+        state.score += POINTS_PER_CORRECT
+        showAnswerDialog(true)
+
+        if (state.score >= MAX_SCORE) {
+            endGame(getString(R.string.win_message))
+        } else {
+            gameState.value = state
+            loadQuestionAndOptions()
+        }
+    }
+
+    private fun handleIncorrectAnswer(state: GameState, correctAnswer: String) {
+        state.incorrectAnswers++
+        showAnswerDialog(false, correctAnswer)
+
+        if (state.incorrectAnswers >= MAX_INCORRECT) {
+            endGame(getString(R.string.game_over_message))
+        } else {
+            gameState.value = state
+            loadQuestionAndOptions()
+        }
+    }
+
+    private fun showAnswerDialog(isCorrect: Boolean, correctAnswer: String = "") {
+        AlertDialog.Builder(this)
+            .setTitle(if (isCorrect) getString(R.string.correct) else getString(R.string.incorrect))
+            .setMessage(if (isCorrect)
+                getString(R.string.correct_message)
+            else getString(R.string.incorrect_message, correctAnswer))
+            .setPositiveButton(getString(R.string.continue_button)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun endGame(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.game_ended))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.return_home)) { _, _ ->
+                goToHome()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun goToHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
+    }
 }

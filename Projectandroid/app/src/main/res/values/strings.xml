@@ -56,4 +56,19 @@
     <string name="commencer">commencer</string>
     <string name="Music">Music</string>
     <string name="Images">Images</string>
+
+    <string name="score_format">Score: %d</string>
+    <string name="question_text">Who is this character?</string>
+    <string name="hint_format">Hint: This character is from %s</string>
+    <string name="no_hints_remaining">No more hints available</string>
+    <string name="select_option">Please select an option</string>
+    <string name="correct">Correct!</string>
+    <string name="incorrect">Incorrect!</string>
+    <string name="correct_message">Your answer is correct!</string>
+    <string name="incorrect_message">Your answer is incorrect. The correct answer is %s.</string>
+    <string name="continue_button">Continue</string>
+    <string name="game_ended">Game Ended</string>
+    <string name="win_message">Congratulations! You have won the game!</string>
+    <string name="game_over_message">Game Over! Better luck next time.</string>
+    <string name="return_home">Return to Home</string>
 </resources>

@@ -3,211 +3,179 @@ package com.example.project_android
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 
+data class Questionz(val text: String, val answers: List<String>, val correctAnswer: String)
 
-data class Q(val text: String, val answers: List<String>, val correctAnswer: String)
-
-// Classe représentant la logique du jeu
-class QuizGamek(private val questions: List<Question>) {
-    private var currentQuestionIndex = 0
-    var score = 0
-    var wrongAnswers = 0
-
-    // Fonction pour obtenir la question actuelle
-    fun getCurrentQuestion(): Question {
-        return questions[currentQuestionIndex]
-    }
-
-    // Fonction pour vérifier si la réponse est correcte
-    fun checkAnswer(userAnswer: String): Boolean {
-        val currentQuestion = getCurrentQuestion()
-        return userAnswer.trim().equals(currentQuestion.correctAnswer, ignoreCase = true)
-    }
-
-    // Fonction pour passer à la question suivante
-    fun nextQuestion() {
-        currentQuestionIndex = (currentQuestionIndex + 1) % questions.size
-    }
-
-    // Fonction pour réinitialiser le jeu
-    fun restartGame() {
-        score = 0
-        wrongAnswers = 0
-        currentQuestionIndex = 0
-    }
-
-    // Fonction pour vérifier si le jeu est terminé (victoire ou défaite)
-    fun isGameOver(): Boolean {
-        return score >= 10 || wrongAnswers >= 3
-    }
-
-    // Fonction pour obtenir l'état du jeu (victoire ou défaite)
-    fun getGameStatus(): String {
-        return when {
-            score >= 10 -> "Félicitations, vous avez gagné !"
-            wrongAnswers >= 3 -> "Désolé, vous avez perdu !"
-            else -> "Continuez à jouer !"
-        }
-    }
-}
-
-// Classe principale de l'activité qui gère l'interface utilisateur
 class SportsActivity : AppCompatActivity() {
-    private lateinit var quizGame: QuizGame
+    private lateinit var questionTextView: TextView
+    private lateinit var answerButtons: List<Button>
+    private lateinit var scoreTextView: TextView
+    private lateinit var buttonReturn: Button
 
-    // Liste des questions avec leurs réponses possibles
-    // Liste des questions avec leurs réponses possibles
+    private val gameState = MutableLiveData<GameState>()
+    private var usedQuestions = mutableSetOf<Int>()
+
+    private data class GameState(var score: Int = 0, var incorrectAnswers: Int = 0, var currentQuestionIndex: Int = -1)
+
     private val questions = listOf(
-        Question("Quel sport est connu sous le nom de 'football' en Amérique ?", listOf("Football américain", "Soccer", "Rugby", "Baseball"), "Football américain"),
-        Question("Qui a remporté la Coupe du Monde de la FIFA 2018 ?", listOf("France", "Croatie", "Allemagne", "Brésil"), "France"),
-        Question("Quel sport utilise une raquette et une petite balle jaune ?", listOf("Tennis", "Badminton", "Ping-pong", "Squash"), "Tennis"),
-        Question("Quel sport est pratiqué sur une piste ovale avec des voitures de course ?", listOf("Formule 1", "NASCAR", "Rallye", "MotoGP"), "Formule 1"),
-        Question("Quel sport est connu pour ses combats en cage octogonale ?", listOf("MMA", "Boxe", "Karaté", "Judo"), "MMA"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de Y ?", listOf("Football américain", "Rugby", "Football australien", "Gaelic football"), "Football américain"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des paniers ?", listOf("Basketball", "Netball", "Handball", "Volleyball"), "Basketball"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon ovale et des buts en forme de H ?", listOf("Rugby", "Football américain", "Football australien", "Gaelic football"), "Rugby"),
-        Question("Quel sport est pratiqué sur une piste de glace avec des patins et un palet ?", listOf("Hockey sur glace", "Patinage artistique", "Curling", "Bobsleigh"), "Hockey sur glace"),
-        Question("Quel sport est pratiqué sur un terrain avec un ballon rond et des buts ?", listOf("Football", "Basketball", "Volleyball", "Handball"), "Football"),
-
+        Questionz("Quel pays a remporté la Coupe du Monde de la FIFA 2018 ?", listOf("France", "Croatie", "Allemagne", "Brésil"), "France"),
+        Questionz("Qui est considéré comme le meilleur joueur de football de tous les temps ?", listOf("Pelé", "Diego Maradona", "Lionel Messi", "Cristiano Ronaldo"), "Pelé"),
+        Questionz("Quel club de football a remporté le plus de titres de la Ligue des Champions de l'UEFA ?", listOf("Real Madrid", "Barcelona", "Manchester United", "Bayern Munich"), "Real Madrid"),
+        Questionz("Qui a remporté le Ballon d'Or en 2021 ?", listOf("Lionel Messi", "Robert Lewandowski", "Cristiano Ronaldo", "Kylian Mbappé"), "Lionel Messi"),
+        Questionz("Quel joueur de basketball est connu sous le surnom de 'The Black Mamba' ?", listOf("Kobe Bryant", "Michael Jordan", "LeBron James", "Shaquille O'Neal"), "Kobe Bryant"),
+        Questionz("Quelle équipe de la NBA a remporté le plus de titres de championnat ?", listOf("Boston Celtics", "Los Angeles Lakers", "Chicago Bulls", "Golden State Warriors"), "Boston Celtics"),
+        Questionz("Qui est considéré comme le meilleur joueur de basketball de tous les temps ?", listOf("Michael Jordan", "LeBron James", "Kareem Abdul-Jabbar", "Magic Johnson"), "Michael Jordan"),
+        Questionz("Quel combattant de MMA est connu sous le surnom de 'The Notorious' ?", listOf("Conor McGregor", "Jon Jones", "Khabib Nurmagomedov", "Anderson Silva"), "Conor McGregor"),
+        Questionz("Quel combattant de MMA est connu pour son style de combat de sambo ?", listOf("Khabib Nurmagomedov", "Fedor Emelianenko", "Daniel Cormier", "Georges St-Pierre"), "Khabib Nurmagomedov"),
+        Questionz("Quel boxeur est connu sous le surnom de 'The Greatest' ?", listOf("Muhammad Ali", "Mike Tyson", "Floyd Mayweather Jr.", "Manny Pacquiao"), "Muhammad Ali"),
+        Questionz("Quel boxeur est connu sous le surnom de 'Iron Mike' ?", listOf("Mike Tyson", "Muhammad Ali", "Floyd Mayweather Jr.", "Manny Pacquiao"), "Mike Tyson"),
+        Questionz("Quel club de football a remporté la Premier League anglaise en 2021 ?", listOf("Manchester City", "Liverpool", "Chelsea", "Manchester United"), "Manchester City"),
+        Questionz("Quel joueur de basketball a remporté le plus de titres de MVP de la NBA ?", listOf("Kareem Abdul-Jabbar", "Michael Jordan", "LeBron James", "Magic Johnson"), "Kareem Abdul-Jabbar"),
+        Questionz("Quel combattant de MMA est connu sous le surnom de 'The Spider' ?", listOf("Anderson Silva", "Jon Jones", "Georges St-Pierre", "Daniel Cormier"), "Anderson Silva"),
+        Questionz("Quel boxeur est connu sous le surnom de 'Money' ?", listOf("Floyd Mayweather Jr.", "Manny Pacquiao", "Oscar De La Hoya", "Canelo Alvarez"), "Floyd Mayweather Jr."),
+        Questionz("Quel joueur de football a remporté le plus de Ballons d'Or ?", listOf("Lionel Messi", "Cristiano Ronaldo", "Johan Cruyff", "Michel Platini"), "Lionel Messi"),
+        Questionz("Quel joueur de basketball a marqué le plus de points en une seule saison de NBA ?", listOf("Wilt Chamberlain", "Michael Jordan", "Kobe Bryant", "LeBron James"), "Wilt Chamberlain"),
+        Questionz("Quel combattant de MMA est connu sous le surnom de 'The Eagle' ?", listOf("Khabib Nurmagomedov", "Conor McGregor", "Jon Jones", "Daniel Cormier"), "Khabib Nurmagomedov"),
+        Questionz("Quel boxeur est connu sous le surnom de 'Pacman' ?", listOf("Manny Pacquiao", "Floyd Mayweather Jr.", "Oscar De La Hoya", "Canelo Alvarez"), "Manny Pacquiao"),
+        Questionz("Quel club de football a remporté la Liga espagnole en 2021 ?", listOf("Atlético Madrid", "Real Madrid", "Barcelona", "Sevilla"), "Atlético Madrid")
     )
+
+
+    companion object {
+        const val MAX_SCORE = 10
+        const val MAX_INCORRECT = 3
+        const val POINTS_PER_CORRECT = 1
+    }
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sports)
 
-        // Mélanger les questions
-        val shuffledQuestions = questions.shuffled()
+        initializeViews()
+        setupGameStateObserver()
+        setupClickListeners()
 
-        // Initialiser le jeu avec les questions mélangées
-        quizGame = QuizGame(shuffledQuestions)
+        gameState.value = GameState()
+        loadQuestionAndOptions()
+    }
 
-        // Initialisation des vues
-        val questionTextView: TextView = findViewById(R.id.questionTextView)
-        val answerButton1: Button = findViewById(R.id.answerButton1)
-        val answerButton2: Button = findViewById(R.id.answerButton2)
-        val answerButton3: Button = findViewById(R.id.answerButton3)
-        val answerButton4: Button = findViewById(R.id.answerButton4)
-        val scoreTextView: TextView = findViewById(R.id.scoreTextView)
-        val buttonReturn: Button = findViewById(R.id.buttonReturn)
+    private fun initializeViews() {
+        questionTextView = findViewById(R.id.questionTextView)
+        answerButtons = listOf(
+            findViewById(R.id.answerButton1),
+            findViewById(R.id.answerButton2),
+            findViewById(R.id.answerButton3),
+            findViewById(R.id.answerButton4)
+        )
+        scoreTextView = findViewById(R.id.scoreTextView)
+        buttonReturn = findViewById(R.id.buttonReturn)
+    }
 
-        // Fonction pour charger la question actuelle et les réponses
-        fun loadQuestion() {
-            val currentQuestion = quizGame.getCurrentQuestion()
-            questionTextView.text = currentQuestion.text
+    private fun setupGameStateObserver() {
+        gameState.observe(this) { state ->
+            scoreTextView.text = getString(R.string.score_format, state.score)
+        }
+    }
 
-            // Mélanger les réponses
-            val shuffledAnswers = currentQuestion.answers.shuffled()
-            answerButton1.text = shuffledAnswers[0]
-            answerButton2.text = shuffledAnswers[1]
-            answerButton3.text = shuffledAnswers[2]
-            answerButton4.text = shuffledAnswers[3]
+    private fun setupClickListeners() {
+        answerButtons.forEach { button ->
+            button.setOnClickListener { checkAnswer(button.text.toString()) }
         }
 
-        // Fonction pour mettre à jour le score affiché
-        fun updateScore() {
-            scoreTextView.text = "Score: ${quizGame.score}"
-        }
-
-        // Fonction pour gérer la fin du jeu
-        fun checkGameStatus() {
-            if (quizGame.isGameOver()) {
-                Toast.makeText(this, quizGame.getGameStatus(), Toast.LENGTH_LONG).show()
-                // Vous pouvez rediriger vers une autre activité ou terminer le quiz
-                quizGame.restartGame()
-                loadQuestion()
-                updateScore()
-                // Rediriger vers une autre activité (par exemple, le menu principal)
-                val intent = Intent(this, HomeActivity::class.java) // Remplacez HomeActivity par votre activité cible
-                startActivity(intent)
-
-                // Vous pouvez également terminer l'activité actuelle si vous ne souhaitez pas revenir à celle-ci
-                finish()
-            }
-        }
-
-        // Initialisation de la première question et du score
-        loadQuestion()
-        updateScore()
-
-        // Fonction générique pour gérer les réponses
-        fun onAnswerSelected(answer: String) {
-            if (quizGame.checkAnswer(answer)) {
-                quizGame.score++
-            } else {
-                quizGame.wrongAnswers++
-                Toast.makeText(this, "Mauvaise réponse ! Erreurs: ${quizGame.wrongAnswers}", Toast.LENGTH_SHORT).show()
-            }
-
-            updateScore()
-            checkGameStatus()
-
-            // Passer à la question suivante avec un délai pour mieux gérer les réponses rapides
-            Handler().postDelayed({
-                quizGame.nextQuestion()
-                loadQuestion()
-            }, 1000) // 1 seconde de délai
-        }
-
-        // Gestion de l'événement au clic sur chaque bouton de réponse
-        answerButton1.setOnClickListener { onAnswerSelected(answerButton1.text.toString()) }
-        answerButton2.setOnClickListener { onAnswerSelected(answerButton2.text.toString()) }
-        answerButton3.setOnClickListener { onAnswerSelected(answerButton3.text.toString()) }
-        answerButton4.setOnClickListener { onAnswerSelected(answerButton4.text.toString()) }
-
-        // Gestion de l'événement au clic sur le bouton "Retour"
         buttonReturn.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, HomeActivity::class.java))
             finish()
         }
+    }
+
+    private fun loadQuestionAndOptions() {
+        gameState.value?.let { state ->
+            val availableIndices = questions.indices.toSet() - usedQuestions
+            if (availableIndices.isEmpty()) usedQuestions.clear() // Reset if all questions used
+
+            state.currentQuestionIndex = availableIndices.random()
+            usedQuestions.add(state.currentQuestionIndex)
+
+            val currentQuestion = questions[state.currentQuestionIndex]
+            questionTextView.text = currentQuestion.text
+            setupOptions(currentQuestion)
+        }
+    }
+
+    private fun setupOptions(currentQuestion: Questionz) {
+        val shuffledAnswers = currentQuestion.answers.shuffled()
+        answerButtons.forEachIndexed { index, button ->
+            button.text = shuffledAnswers[index]
+        }
+    }
+
+    private fun checkAnswer(selectedAnswer: String) {
+        gameState.value?.let { state ->
+            val currentQuestion = questions[state.currentQuestionIndex]
+
+            if (selectedAnswer == currentQuestion.correctAnswer) {
+                handleCorrectAnswer(state)
+            } else {
+                handleIncorrectAnswer(state, currentQuestion.correctAnswer)
+            }
+        }
+    }
+
+    private fun handleCorrectAnswer(state: GameState) {
+        state.score += POINTS_PER_CORRECT
+        showAnswerDialog(isCorrect = true)
+
+        if (state.score >= MAX_SCORE) {
+            endGame(getString(R.string.win_message))
+        } else {
+            gameState.value = state
+            loadQuestionAndOptions()
+        }
+    }
+
+    private fun handleIncorrectAnswer(state: GameState, correctAnswer: String) {
+        state.incorrectAnswers++
+        showAnswerDialog(isCorrect = false, correctAnswer)
+
+        if (state.incorrectAnswers >= MAX_INCORRECT) {
+            endGame(getString(R.string.game_over_message))
+        } else {
+            gameState.value = state
+            loadQuestionAndOptions()
+        }
+    }
+
+    private fun showAnswerDialog(isCorrect: Boolean, correctAnswer: String = "") {
+        val message = if (isCorrect) {
+            getString(R.string.correct_message)
+        } else {
+            getString(R.string.incorrect_message, correctAnswer)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(if (isCorrect) getString(R.string.correct) else getString(R.string.incorrect))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.continue_button)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun endGame(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.game_ended))
+            .setMessage(message)
+            .setPositiveButton(getString(R.string.return_home)) { _, _ -> goToHome() }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun goToHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 }
