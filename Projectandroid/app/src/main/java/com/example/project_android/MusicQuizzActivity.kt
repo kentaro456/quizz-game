@@ -63,42 +63,41 @@ class MusicQuizActivity : AppCompatActivity() {
     // Alternatives par catégorie pour les mauvaises réponses
     private val alternativesByCategory = mapOf(
         "Action" to listOf(
-            "One Piece", "Naruto", "Dragon Ball Z", "My Hero Academia",
-            "Attack on Titan", "Demon Slayer", "Jujutsu Kaisen", "Hunter x Hunter",
-            "One Punch Man", "Mob Psycho 100", "Black Clover", "Fire Force"
+            "One Piece Opening", "Naruto Opening", "Dragon Ball Z Opening", "My Hero Academia Opening",
+            "Attack on Titan Opening", "Demon Slayer Opening", "Jujutsu Kaisen Opening", "Hunter x Hunter Opening",
+            "One Punch Man Opening", "Mob Psycho 100 Opening", "Black Clover Opening", "Fire Force Opening"
         ),
         "Fantasy" to listOf(
-            "Fairy Tail", "The Seven Deadly Sins", "Black Clover",
-            "Magi", "Re:Zero", "Sword Art Online", "That Time I Got Reincarnated as a Slime",
-            "Overlord", "No Game No Life", "Log Horizon"
+            "Fairy Tail Opening", "The Seven Deadly Sins Opening", "Black Clover Opening",
+            "Magi Opening", "Re:Zero Opening", "Sword Art Online Opening", "That Time I Got Reincarnated as a Slime Opening",
+            "Overlord Opening", "No Game No Life Opening", "Log Horizon Opening"
         ),
         "Supernatural" to listOf(
-            "Noragami", "Death Note", "Blue Exorcist", "Soul Eater",
-            "Bleach", "JoJo's Bizarre Adventure", "Yu Yu Hakusho",
-            "Bungo Stray Dogs", "Mob Psycho 100", "The God of High School"
+            "Noragami Opening", "Death Note Opening", "Blue Exorcist Opening", "Soul Eater Opening",
+            "Bleach Opening", "JoJo's Bizarre Adventure Opening", "Yu Yu Hakusho Opening",
+            "Bungo Stray Dogs Opening", "Mob Psycho 100 Opening", "The God of High School Opening"
         ),
         "Horror" to listOf(
-            "Tokyo Ghoul", "Another", "Hellsing", "Parasyte",
-            "The Promised Neverland", "Elfen Lied", "Deadman Wonderland",
-            "Higurashi", "Blood+", "Shiki"
+            "Tokyo Ghoul Opening", "Another Opening", "Hellsing Opening", "Parasyte Opening",
+            "The Promised Neverland Opening", "Elfen Lied Opening", "Deadman Wonderland Opening",
+            "Higurashi Opening", "Blood+ Opening", "Shiki Opening"
         ),
         "Drama" to listOf(
-            "Your Lie in April", "Anohana", "Steins;Gate", "Erased",
-            "Angel Beats", "Violet Evergarden", "March Comes in Like a Lion",
-            "A Silent Voice", "Clannad", "Orange"
+            "Your Lie in April Opening", "Anohana Opening", "Steins;Gate Opening", "Erased Opening",
+            "Angel Beats Opening", "Violet Evergarden Opening", "March Comes in Like a Lion Opening",
+            "A Silent Voice Opening", "Clannad Opening", "Orange Opening"
         ),
         "Comedy" to listOf(
-            "Gintama", "One Punch Man", "K-On!", "Nichijou",
-            "Grand Blue", "Daily Lives of High School Boys", "Konosuba",
-            "Saiki K.", "Love is War", "Asobi Asobase"
+            "Gintama Opening", "One Punch Man Opening", "K-On! Opening", "Nichijou Opening",
+            "Grand Blue Opening", "Daily Lives of High School Boys Opening", "Konosuba Opening",
+            "Saiki K. Opening", "Love is War Opening", "Asobi Asobase Opening"
         ),
         "Romance" to listOf(
-            "Toradora", "Kimi ni Todoke", "Fruits Basket", "Horimiya",
-            "Clannad", "Your Name", "Rascal Does Not Dream of Bunny Girl Senpai",
-            "Kaguya-sama: Love is War", "Golden Time", "My Love Story!!"
+            "Toradora Opening", "Kimi ni Todoke Opening", "Fruits Basket Opening", "Horimiya Opening",
+            "Clannad Opening", "Your Name Opening", "Rascal Does Not Dream of Bunny Girl Senpai Opening",
+            "Kaguya-sama: Love is War Opening", "Golden Time Opening", "My Love Story!! Opening"
         )
     )
-
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

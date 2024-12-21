@@ -13,7 +13,7 @@ import kotlin.random.Random
 data class ImageItem(
     val titles: List<String>,
     val resourceId: Int,
-    val series: String // Added series information
+    val series: String
 )
 
 class ImagesQuizActivity : AppCompatActivity() {
@@ -106,7 +106,7 @@ class ImagesQuizActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         submitButton.setOnClickListener { checkAnswer() }
 
-        // Add hint button functionality
+
         findViewById<Button>(R.id.hintButton).setOnClickListener {
             showHint()
         }
